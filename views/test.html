@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <title>Title</title>
+</head>
+<body>
+<button id="do1">执行</button>
+<div id="do2">123</div>
+</body>
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript">
+      $(function () {
+              var str = 'http://www.jb51.net/article/74614.htm';
+              var pop = str.split('/').pop();
+              console.log(pop);
+              $('#do1').click(function () {
+                      var jqXML = $.ajax({
+                              url: '/listfun',
+                              type: 'POST',
+                              dataType: 'json'
+                      });
+                      jqXML.done(function (json) {
+                              if(json.code == 201){
+                                      alert(json.msg);
+                              }else {
+                                      alert('fin!');
+                                      console.log(json);
+                                      alert(json);
+                              }
+                      })
+              })
+      })
+</script>
+</html>

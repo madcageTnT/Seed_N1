@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <title></title>
+      <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.min.css">
+      <link rel="stylesheet" href="components/bootstrap-table/dist/bootstrap-table.min.css">
+      <link rel="stylesheet" href="../public/components/bootstrap/dist/css/bootstrap.css">
+      <link rel="stylesheet" href="components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css">
+      <style>
+            body{
+                  margin: 50px;
+                  width:100%;
+            }
+            html{
+                  width:100%;
+            }
+      </style>
+</head>
+<body>
+
+<div class="page-header">
+      <h1>考勤管理</h1>
+      <button class="btn btn-default" id="setting">设置</button>
+      <button class="btn btn-info" id="query">查询</button>
+</div>
+
+
+<div class="container">
+      <div class="row">
+            <div id="toolbar" class="btn-group" style="visibility: hidden">
+                  <button id="delAll" type="button" class="btn btn-default" ><span class="glyphicon glyphicon-remove" aria-hidden="true" ></span>删除所选</button>
+                  <!--<select id="exportmd" class="form-control" style="width: 20%">-->
+                        <!--<option>选择导出模式</option>-->
+                        <!--<option>基本</option>-->
+                        <!--<option>全部</option>-->
+                        <!--<option>选定</option>-->
+                  <!--</select>-->
+            </div>
+            <table id="table4"></table>
+      </div>
+</div>
+
+<div class="modal" id="modalSetting" tabindex="-1" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                  <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalTitle">出勤设置</h4>
+                  </div>
+                  <div class="modal-body">
+                        <form>
+                              <div class="form-group">
+                                    <label for="uptime" class="control-label">上班时间：</label>
+                                    <input type="text" class="form-control" id="uptime" placeholder="点击设置时间">
+                              </div>
+                              <div class="form-group">
+                                    <label for="downtime" class="control-label">下班时间:</label>
+                                    <input type="text" class="form-control" id="downtime" placeholder="点击设置时间">
+                              </div>
+                        </form>
+                  </div>
+                  <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="updata">提交</button>
+                  </div>
+            </div>
+      </div>
+</div>
+
+
+</body>
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script src="components/moment/min/moment.min.js"></script>
+<script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.js"></script>
+<script src="components/bootstrap-table/dist/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js"></script>
+<script src="components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+
+<script>
+      var uptime = "0900";
+      var downtime = "1800";
+      $(function () {
+              $('#setting').click(function () {
+                      $('#modalSetting').modal('show');
+              });
+              $('#uptime').datetimepicker({
+                      format: 'HH:mm'
+              });
+              $('#downtime').datetimepicker({
+                      format: 'HH:mm'
+              });
+              $('#updata').click(function () {
+                      showSET();
+              });
+              $('#query').click(function () {
+                      var get1 = $('#uptime').val();
+                      var get2 = $('#downtime').val();
+                      if(get1 || get2 == ""){
+                              alert('将使用默认设置');
+                              checkInit();
+                      }else{
+                              alert('加载设置');
+                              checkInit();
+                      }
+              });
+              $('#delAll').click(function () {
+                      getSelection();
+              })
+      });
+
+      function checkInit() {
+              var oTable = new ClistInit();
+              oTable.Init();
+
+              $('#toolbar').css('visibility', 'visible');
+      }
+
+      function getSelection() {
+              var data =$.map($('#table4').bootstrapTable('getSelections'), function (row) {
+                      return row._id;
+              });
+              var length = $('#table4').bootstrapTable('getSelections').length;
+              console.log(length);
+              if(length == 0){
+                      alert('请至少选择一个数据!');
+              }else {
+                      var ja = confirm('操作不可逆,是否确认删除?');
+                      if(ja == true){
+                              checkDel(data);
+                      }else{
+                              $('#table4').bootstrapTable('refresh');
+                      }
+
+
+              }
+      }
+
+      var showSET = function () {
+              uptime = getNUM($('#uptime').val());
+              downtime = getNUM($('#downtime').val());
+      };
+
+      var getNUM = function (value) {
+              var num = value.replace(/[^0-9]/ig,"");
+              return num;
+      };
+
+      var ClistInit = function () {
+              var oClistInit = new Object();
+              oClistInit.Init = function () {
+                      $('#table4').bootstrapTable({
+                              url: "checkwork",
+                              method: "post",
+                              toolbar: '#toolbar',
+                              striped: true,
+                              cache: false,
+                              pagination: true,
+                              sortable: true,
+                              sortOrder: "asc",
+                              queryParams: oClistInit.queryParams,
+                              sidePagination: "client",
+                              pageNumber: 1,
+                              pageSize: 10,
+                              pageList: [10, 25, 50, 100],
+                              search: true,
+                              strictSearch: true,
+                              showColumns: true,
+                              showRefresh: true,
+                              minimumCountColumns: 2,
+                              clickToSelect: true,
+                              uniqueId: "id",
+                              showToggle:true,
+                              cardView: false,
+                              detailView: false,
+                              showExport: true,                     //是否显示导出
+                              exportDataType: "basic",              //basic', 'all', 'selected'.
+                              columns: [{
+                                      checkbox: true
+                              },{
+                                      field: 'workname',
+                                      title: '员工姓名'
+                              },{
+                                      field: 'workphone',
+                                      title: '联系方式'
+                              },{
+                                      field: 'workdate',
+                                      title: '日期',
+                                      sortable: true
+                              },{
+                                      field: 'workup',
+                                      title: '到达时间'
+                              },{
+                                      field: 'workdown',
+                                      title: '离开时间'
+                              },{
+                                      field: 'upstat',
+                                      title: '上午情况',
+                                      sortable: true
+                              },{
+                                      field: 'downstat',
+                                      title: '下午情况',
+                                      sortable: true
+                              }]
+                      })
+              };
+              oClistInit.queryParams = function (params) {
+                      var temp = {
+                              limit: params.limit,
+                              offset: params.offset
+                      };
+                      return temp;
+              };
+              return oClistInit;
+      };
+
+
+
+      var checkDel = function (data) {
+              var mdata = {"checkpid": data};
+              $.ajax({
+                      type: "POST",
+                      url: "checkwork/remove",
+                      data:JSON.stringify(mdata),
+                      dataType: 'json',
+                      contentType:"application/json"
+              }).done(function (json) {
+                      if(json.code ==200){
+                              alert(json.msg);
+                              $('#table4').bootstrapTable('refresh');
+                      }else{
+                              alert(json.msg);
+                      }
+              })
+      };
+
+
+
+
+</script>
+</html>

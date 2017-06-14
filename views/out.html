@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="components/bootstrap-table/dist/bootstrap-table.min.css">
+      <!--<link rel="stylesheet" href="../public/components/bootstrap/dist/css/bootstrap.css">-->
+      <style>
+           body{
+                 margin: 50px;
+                 width:100%;
+           }
+           html{
+                 width:100%;
+           }
+      </style>
+</head>
+<body>
+
+<div class="page-header">
+      <h1>员工管理</h1>
+      <button class="btn btn-default">部门管理</button>
+      <button class="btn btn-info" id="query">查询</button>
+      </div>
+
+
+
+<div class="container">
+      <div class="row">
+            <div id="toolbar" class="btn-group" style="visibility: hidden">
+                  <button type="button" class="btn btn-default" onclick="addInit()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>添加</button>
+                  <button id="sel" type="button" class="btn btn-default" ><span class="glyphicon glyphicon-remove" aria-hidden="true" ></span>删除所选</button>
+            </div>
+            <table id="table1"></table>
+      </div>
+</div>
+
+
+
+<div class="modal" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                  <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalTitle"></h4>
+                  </div>
+                  <div class="modal-body">
+                        <form>
+                              <div class="form-group">
+                                    <label for="mebpid" class="control-label">数据库所属ID:</label>
+                                    <input type="text" class="form-control" id="mebpid" disabled>
+                              </div>
+                              <div class="form-group">
+                                    <label for="mebname" class="control-label">员工姓名:</label>
+                                    <input type="text" class="form-control" id="mebname">
+                              </div>
+                              <div class="form-group">
+                                    <label for="mebconf" class="control-label">职位:</label>
+                                    <input type="text" class="form-control" id="mebconf">
+                              </div>
+                              <div class="form-group">
+                                    <label for="mebphone" class="control-label">联系方式:</label>
+                                    <input type="text" class="form-control" id="mebphone">
+                              </div>
+                              <div class="form-group">
+                                    <label for="mebloc" class="control-label">所属部门:</label>
+                                    <input type="text" class="form-control" id="mebloc">
+                              </div>
+                              <div class="form-group">
+                                    <label for="mebtime" class="control-label">入职时间:</label>
+                                    <input type="text" class="form-control" id="mebtime">
+                              </div>
+                        </form>
+                  </div>
+                  <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="btnSub">添加</button>
+                  </div>
+            </div>
+      </div>
+</div>
+</body>
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.js"></script>
+
+<script>
+      $(function () {
+              $('#query').click(function () {
+                      funInit();
+              });
+
+              $('#sel').click(function () {
+                      getSelection();
+              });
+
+              $('#btnSub').click(function () {
+                      var die = $('#btnSub').text();
+                      if(die == '添加'){
+
+                              addFunc();
+                      }else if(die == '提交'){
+
+                              editFunc();
+                      }
+              });
+//
+      });
+      function getSelection() {
+            var data =$.map($('#table1').bootstrapTable('getSelections'), function (row) {
+                    return row._id;
+            });
+            var length = $('#table1').bootstrapTable('getSelections').length;
+            console.log(length);
+            if(length == 0){
+                    alert('请至少选择一个数据!');
+            }else {
+                    var ja = confirm('操作不可逆,是否确认删除?');
+                    if(ja == true){
+                            delFunc(data);
+                    }else{
+                            $('#table1').bootstrapTable('refresh');
+                    }
+
+
+            }
+      }
+
+      function funInit() {
+              var oTable = new TableInit();
+              oTable.Init();
+
+              $('#toolbar').css('visibility', 'visible');
+
+      }
+      var TableInit = function () {
+              var oTableInit = new Object();
+              oTableInit.Init = function () {
+                      $('#table1').bootstrapTable({
+                              url: 'meblist1',
+                              method: 'post',
+                              toolbar: '#toolbar',
+                              striped: true,
+                              cache: false,
+                              pagination: true,
+                              sortable: true,
+                              sortOrder: "asc",
+                              queryParams: oTableInit.queryParams,
+                              sidePagination: "client",
+                              pageNumber: 1,
+                              pageSize: 10,
+                              pageList: [10, 25, 50, 100],
+                              search: true,
+                              strictSearch: true,
+                              showColumns: true,                  //是否显示所有的列
+                              showRefresh: true,
+                              minimumCountColumns: 2,             //最少允许的列数
+                              clickToSelect: true,
+                              uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                              showToggle:true,                    //是否显示详细视图和列表视图的切换按钮
+                              cardView: false,                    //是否显示详细视图
+                              detailView: false, //是否显示父子表//是否启用点击选中行
+                              columns: [{
+                                      checkbox: true
+                              },{
+                                      field: 'mebname',
+                                      title: '员工姓名'
+
+                              },{
+                                      field: 'mebconf',
+                                      title: '员工职位'
+
+                              },{
+                                      field: 'mebphone',
+                                      title: '联系电话'
+                              },{
+                                      field: 'mebloc',
+                                      title: '所属部门'
+
+                              },{
+                                      field: 'mebtime',
+                                      title: '入职时间'
+
+                              },{
+                                      title: '操作',
+                                      field: '_id',
+                                      align: 'center',
+                                      formatter: function (value, row, index) {
+                                              var edit = '<a onclick="editInit(\'' + row._id + '\',\'' + row.mebname
+                                                  + '\',\'' + row.mebconf + '\',\''+row.mebphone+'\',\''+row.mebloc+'\',\''+row.mebtime+
+                                                  '\')"><span class="glyphicon glyphicon-edit"></span></a>';
+                                              return edit;
+                                      }
+
+                              }]
+                      });
+              };
+              oTableInit.queryParams = function (params) {
+                      var temp = {
+                              limit: params.limit,
+                              offset: params.offset
+                      };
+                      return temp;
+              };
+              return oTableInit;
+      };
+
+
+
+      var addInit = function () {
+              $('#modalEdit').modal('show');
+              $('#mebpid').val('');
+              $('#mebname').val('');
+              $("#mebconf").val('');
+              $("#mebphone").val('');
+              $("#mebloc").val('');
+              $("#mebtime").val('');
+              $("#btnSub").text('添加');
+      };
+
+      var editInit = function (id, name, conf, phone, loc, time) {
+              $('#modalEdit').modal('show');
+              $('#mebpid').val(id);
+              $('#mebname').val(name);
+              $("#mebconf").val(conf);
+              $("#mebphone").val(phone);
+              $("#mebloc").val(loc);
+              $("#mebtime").val(time);
+              $("#btnSub").text('提交');
+      };
+
+      var AjaxIns = function(Url,Data){
+              $.ajax({
+                      type:"post",
+                      url: Url,
+                      dataType:"json",
+                      contentType:"application/json",
+                      data:JSON.stringify(Data)
+              }).done(function (json) {
+                      if(json.code ==200){
+                              alert(json.msg);
+                              $('#modalEdit').modal("hide");
+                              $('#table1').bootstrapTable('refresh');
+                      }else{
+                              alert(json.msg);
+                      }
+              })
+      };
+      var addFunc = function () {
+              var mebData = {
+                      "mebname": $('#mebname').val(),
+                      "mebconf": $('#mebconf').val(),
+                      "mebphone": $('#mebphone').val(),
+                      "mebloc": $('#mebloc').val(),
+                      "mebtime": $('#mebtime').val()
+              };
+              var url = "meblist1/insert";
+              AjaxIns(url, mebData);
+      };
+
+      var editFunc = function () {
+              var mebData = {
+                      "mebpid": $('#mebpid').val(),
+                      "mebname": $('#mebname').val(),
+                      "mebconf": $('#mebconf').val(),
+                      "mebphone": $('#mebphone').val(),
+                      "mebloc": $('#mebloc').val(),
+                      "mebtime": $('#mebtime').val()
+              }
+              var url = "meblist1/update";
+              AjaxIns(url,mebData);
+      };
+
+      var delFunc = function (json) {
+              var mebData = {"mebpid": json};
+              var url = "meblist1/delete";
+              AjaxIns(url,mebData);
+      };
+
+
+</script>
+</html>

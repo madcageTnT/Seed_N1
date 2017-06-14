@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <title></title>
+      <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.min.css">
+      <link rel="stylesheet" href="components/bootstrap-table/dist/bootstrap-table.min.css">
+      <!--<link rel="stylesheet" href="../public/components/bootstrap/dist/css/bootstrap.css">-->
+      <style>
+            body{
+                  margin: 50px;
+                  width:100%;
+            }
+            html{
+                  width:100%;
+            }
+      </style>
+</head>
+<body>
+
+<div class="page-header">
+      <h1>加班管理</h1>
+      <button class="btn btn-info" id="query">检索</button>
+</div>
+</div>
+
+
+<div class="container">
+      <div class="row">
+            <div id="toolbar" class="btn-group" style="visibility: hidden">
+                  <button type="button" id="passAll" class="btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>批量通过</button>
+                  <button id="delAll" type="button" class="btn btn-default" ><span class="glyphicon glyphicon-remove" aria-hidden="true" ></span>删除所选</button>
+            </div>
+            <table id="table3"></table>
+      </div>
+</div>
+
+</body>
+
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.js"></script>
+
+
+<script>
+      var pid ;//操作按钮全局变量
+
+      $(function () {
+              $('#query').click(function () {
+                      table1init();
+              });
+              $('#passAll').click(function () {
+                      getwithPass();
+              });
+              $('#delAll').click(function () {
+                      getwithDel();
+              })
+      });
+
+      function  table1init() {
+              var table1 = new QueryInit();
+              table1.Init();
+              $('#toolbar').css('visibility', 'visible');
+      }
+
+
+      var QueryInit = function () {
+              var oQueryInit = new Object();
+              oQueryInit.Init = function () {
+                      $('#table3').bootstrapTable({
+                              url: "misslist",
+                              method: "post",
+                              toolbar: '#toolbar',
+                              striped: true,
+                              cache: false,
+                              pagination: true,
+                              sortable: true,
+                              sortOrder: "asc",
+                              queryParams: oQueryInit.queryParams,
+                              sidePagination: "client",
+                              pageNumber: 1,
+                              pageSize: 10,
+                              pageList: [10, 25, 50, 100],
+                              search: true,
+                              strictSearch: true,
+                              showColumns: true,
+                              showRefresh: true,
+                              minimumCountColumns: 2,
+                              clickToSelect: true,
+                              uniqueId: "id",
+                              showToggle:true,
+                              cardView: false,
+                              detailView: false,
+                              columns: [{
+                                      checkbox: true
+                              },{
+                                      field: 'misstime',
+                                      title: '加班时间',
+                                      sortable: true
+                              },{
+                                      field: 'misslang',
+                                      title: '加班时长'
+                              },{
+                                      field: 'missinfo',
+                                      title: '加班理由'
+                              },{
+                                      field: 'missmann',
+                                      title: '加班人员'
+                              },{
+                                      field: 'missloc',
+                                      title: '所属部门'
+                              },{
+                                      field: 'misssta',
+                                      title: '状态',
+                                      sortable: true
+                              },{
+                                      title: '操作',
+                                      field: '_id',
+                                      formatter: function (value, row, index) {
+                                              if(row.misssta == '已审核'){
+                                                      var del = '<a onclick="delMiss(\'' + row._id + '\')"><span class="glyphicon glyphicon-remove"></span></a>';
+                                                      return del;
+                                              }else {
+                                                      var pass =  '<a onclick="passMiss(\'' + row._id + '\')"><span class="glyphicon glyphicon-ok"></span></a>';
+                                                      return pass;
+                                              }
+                                      }
+                              }]
+
+                      });
+
+              };
+              oQueryInit.queryParams = function (params) {
+                      var temp = {
+                              limit: params.limit,
+                              offset: params.offset
+                      };
+                      return temp;
+              };
+              return oQueryInit;
+      };
+
+      var passMiss = function (id) {
+              var data = {
+                      "misspid": id
+              };
+              var url = "misslist/pass";
+              ajaxFUN(url, data);
+      };
+
+      var delMiss = function (id) {
+              var data = {
+                      "misspid": id
+              };
+              var url = "misslist/delete";
+              ajaxFUN(url, data);
+      };
+
+      var getwithDel = function () {
+              var data =$.map($('#table3').bootstrapTable('getSelections'), function (row) {
+                      return row._id;
+              });
+              var length = $('#table3').bootstrapTable('getSelections').length;
+              console.log(length);
+              if(length == 0){
+                      alert('请至少选择一个数据!');
+              }else {
+                      var ja = confirm('操作不可逆,是否确认删除?');
+                      if(ja == true){
+                              delMiss(data);
+                      }else{
+                              $('#table3').bootstrapTable('refresh');
+                      }
+
+
+              }
+      };
+
+      var getwithPass = function () {
+              var data =$.map($('#table3').bootstrapTable('getSelections'), function (row) {
+                      return row._id;
+              });
+              var length = $('#table3').bootstrapTable('getSelections').length;
+              console.log(length);
+              if(length == 0){
+                      alert('请至少选择一个数据!');
+              }else {
+                      var ja = confirm('操作不可逆,是否确认通过审核?');
+                      if(ja == true){
+                              passMiss(data);
+                      }else{
+                              $('#table3').bootstrapTable('refresh');
+                      }
+
+              }
+      };
+
+
+
+      var ajaxFUN =function (url, data) {
+            $.ajax({
+                    type: "POST",
+                    url: url,
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(data)
+            }).done(function (json) {
+                    if(json.code ==200){
+                            alert(json.msg);
+                            $('#table3').bootstrapTable('refresh');
+                    }else{
+                            alert(json.msg);
+                    }
+            })
+      };
+
+
+
+
+</script>
+</html>

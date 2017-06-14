@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <title><%= title %></title>
+      <link rel="stylesheet" href="/components/bootstrap/dist/css/bootstrap.min.css">
+      <link rel="stylesheet" href="css/index/ie10-viewport-bug-workaround.css">
+      <link rel="stylesheet" href="css/index/cover.css">
+      <script src="js/index/ie-emulation-modes-warning.js"></script>
+</head>
+<body>
+<div class="site-wrapper">
+      <div class="site-wrapper-inner">
+            <div class="cover-container">
+                  <div class="masthead clearfix">
+                        <div class="inner">
+                              <h3 class="masthead-brand">MCG Manger System</h3>
+                              <nav>
+                                    <ul class="nav masthead-nav">
+                                          <li class="active"><a href="#">主页</a></li>
+                                          <li><a href="#" data-toggle="modal" data-target="#loginmodal">登录</a></li>
+                                          <li><a href="#" data-toggle="modal" data-target="#regmodal">账号请求</a></li>
+                                    </ul>
+                              </nav>
+                        </div>
+                  </div>
+
+                  <div class="inner cover">
+                        <h1 class="cover-heading">MCG Manger System</h1>
+                        <p class="lead">Easy SME management system for daily management</p>
+                        <p class="lead">Version:0.0.1</p>
+                        <p class="lead">
+                              <a href="#" class="btn btn-lg btn-default">Learn more</a>
+                        </p>
+                  </div>
+
+                  <div class="mastfoot">
+                        <div class="inner">
+                              <p>By<a href=#>@madcage</a>.</p>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>
+
+<div class="modal fade bs-example-modal-sm" id="loginmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" style="top: 300px">
+      <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                  <div class="login-panel panel panel-default">
+                        <div class="panel-heading">
+                              <h3 class="panel-title">MCG Manger System</h3>
+                        </div>
+                        <div class="panel-body">
+                              <form role="form" method="post">
+                                    <fieldset>
+                                          <legend></legend>
+                                          <div class="form-group">
+                                                <input class="form-control" placeholder="用户名" type="text" name="username" id="username" autofocus>
+                                          </div>
+                                          <div class="form-group">
+                                                <input class="form-control" placeholder="密码" name="password" type="password" id="password" value="">
+                                          </div>
+                                          <!--<div class="checkbox" style="color: #000; left: -100px;">-->
+                                                <!--<label>-->
+                                                      <!--<input name="remember" type="checkbox" value="Remember Me" id="remCbx">记住我-->
+                                                <!--</label>-->
+                                          <!--</div>-->
+                                          <a  class="btn btn-lg btn-danger btn-block" id="login0">登录</a>
+                                    </fieldset>
+                              </form>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>
+
+<div class="modal fade bs-example-modal-sm" id="regmodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel1" style="top: 300px">
+      <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                  <div class="login-panel panel panel-default">
+                        <div class="panel-heading">
+                              <h3 class="panel-title">账号请求</h3>
+                        </div>
+                        <div class="panel-body">
+                              <form role="form" method="post">
+                                    <fieldset>
+                                          <legend></legend>
+                                          <div class="form-group">
+                                                <input class="form-control" placeholder="请输入邮箱地址" name="email1" type="email" id="email1" value="" autofocus>
+                                          </div>
+                                          <div class="form-group">
+                                                <input class="form-control" placeholder="用户名" type="text" name="username1" id="username1" >
+                                          </div>
+                                          <div class="form-group">
+                                                <input class="form-control" placeholder="密码" name="password1" type="password" id="password1" value="">
+                                          </div>
+                                          <!--<div class="checkbox" style="color: #000; left: -100px;">-->
+                                          <!--<label>-->
+                                          <!--<input name="remember" type="checkbox" value="Remember Me" id="remCbx">记住我-->
+                                          <!--</label>-->
+                                          <!--</div>-->
+                                          <a  class="btn btn-lg btn-danger btn-block" id="reg">注册</a>
+                                    </fieldset>
+                              </form>
+                        </div>
+                  </div>
+            </div>
+      </div>
+</div>
+</body>
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="js/index/ie10-viewport-bug-workaround.js"></script>
+<script src="components/moment/moment.js"></script>
+<script src="components/moment/locale/zh-cn.js"></script>
+<script src="components/js-base64/base64.js"></script>
+<script type="text/javascript">
+      $(function () {
+              $('#login0').click(function () {
+                      var username = $('#username').val();
+                      var password = $('#password').val();
+                      var data = {"username": username,"password":password};
+
+                      var jqXML = $.ajax({
+                              url: '/userlogin',
+                              type: 'POST',
+                              dataType: 'json',
+                              data: data
+                      });
+
+                      jqXML.done(function (json) {
+                              if(json.code == 200){
+                                      alert(json.msg);
+                                      location.href = '/main'
+                              }else {
+                                      alert(json.msg);
+                              }
+                      })
+              });
+              
+              $('#reg').click(function () {
+                      var email = $('#email1').val();
+                      var username = $('#username1').val();
+                      var password = $('#password1').val();
+                      var date = moment().format('LLL');
+                      var base64 = Base64.encode(password);
+                      var base64URI = Base64.encodeURI(password);
+                      var data = {
+                              "html": '<h1>账号请求</h1><h3>请求时间：'+ date +'</h3><h4>Email： '+email+' </h4><h4>用户名：'+username+'</h4><h4>密码：</h4><h5>code: '+base64+'</h5><h5>code: '+base64URI+'</h5>'
+                      };
+                      $.ajax({
+                              url: "regAdmin",
+                              type: 'POST',
+                              dataType: 'json',
+                              contentType:"application/json",
+                              data:JSON.stringify(data)
+                      }).done(function (json) {
+                              if(json.code == 200){
+                                      alert(json.msg);
+                                      $('#regmodal').modal('hide');
+                                      $('#email1').val('');
+                                      $('#username1').val('');
+                                      $('#password1').val('');
+                              } else {
+                                      alert(json.msg);
+                              }
+                      })
+
+              })
+      })
+</script>
+</html>

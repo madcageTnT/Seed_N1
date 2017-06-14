@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="utf-8">
+      <title><%=title%></title>
+</head>
+<body>
+<h1>~<%=title%>~</h1>
+<form id="myForm" method="post">
+      帐号：<input type="text" name="username" id="username"/><br/><br/>
+      密码：<input type="password" name="password" id="password"/><br/><br/>
+      <input type="button" value="注册" node-type="register" id="reg" /> &nbsp; <input type="button" value="登录" node-type="submit" id="login0"/>
+</form>
+</body>
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script src="components/moment/min/moment.min.js"></script>
+<script type="text/javascript">
+            $(function () {
+                    $('#reg').click(function () {
+
+                            var username = $('#username').val();
+                            var password = moment().format('HH:mm');
+                            var data = {"username": username,"password":password};
+                            var jqXML = $.ajax({
+                                    url: '/reg',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: data
+                            });
+                            jqXML.done(function (json) {
+                                    if(json.code == 200){
+                                            alert(json.msg);
+                                    }else{
+                                            alert(json.msg);
+                                    }
+                            })
+                    })
+
+                    $('#login0').click(function () {
+                            var username = $('#username').val();
+                            var password = $('#password').val();
+                            var data = {"username": username,"password":password};
+                            var jqXML = $.ajax({
+                                    url: '/userlogin',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: data
+                            });
+                            jqXML.done(function (json) {
+                                    if(json.code == 200){
+                                            alert(json.msg);
+                                            location.href = '/'
+                                    }else {
+                                            alert(json.msg);
+                                    }
+                            })
+                    })
+            })
+
+</script>
+</html>

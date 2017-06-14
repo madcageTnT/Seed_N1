@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <title></title>
+      <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.min.css">
+      <link rel="stylesheet" href="components/bootstrap-table/dist/bootstrap-table.min.css">
+      <link rel="stylesheet" href="../public/components/bootstrap/dist/css/bootstrap.css">
+      <style>
+            body{
+                  margin: 50px;
+                  width:100%;
+            }
+            html{
+                  width:100%;
+            }
+      </style>
+</head>
+<body>
+<div class="page-header">
+      <h1>部门管理</h1>
+      <button class="btn btn-info" id="query">查询</button>
+</div>
+<div class="container">
+      <div class="row">
+            <div id="toolbar" class="btn-group" style="visibility: hidden">
+                  <button id="insbtn" type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>添加</button>
+            </div>
+            <table id="table2"></table>
+      </div>
+</div>
+
+<div class="modal" id="modalEdit" tabindex="-1" role="dialog" aria-labelledby="modalTitle">
+      <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                  <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalTitle">编辑部门</h4>
+                  </div>
+                  <div class="modal-body">
+                        <form>
+                              <div class="form-group">
+                                    <label for="offname" class="control-label">部门名称:</label>
+                                    <input type="text" class="form-control" id="offname">
+                              </div>
+                              <div class="form-group">
+                                    <label for="offnum" class="control-label">人员数量:
+                                          <a id="numcg"><span class="glyphicon glyphicon-record
+"></span></a>
+                                    </label>
+                                    <input type="text" class="form-control" id="offnum" disabled>
+                              </div>
+                              <div class="form-group">
+                                    <label for="offtime" class="control-label">成立时间:</label>
+                                    <input type="text" class="form-control" id="offtime" disabled>
+                              </div>
+                              <div class="panel panel-default">
+                                    <div class="panel-heading"><span >部门负责人:</span>
+                                          <a id="selmain"><span class="glyphicon glyphicon-edit"></span></a>
+                                    </div>
+                                    <div class="panel-body">
+                                          <!--<img src="..." alt="..." class="img-thumbnail">-->
+                                          <h3 id="main_id"></h3>
+                                    </div>
+                                    <ul class="list-group">
+                                          <li class="list-group-item">入职年份：<span id="main_time"></span></li>
+                                          <li class="list-group-item">
+                                                <div id="main_conn">
+                                                      <h4>联系方式</h4>
+                                                      <p>Telephone：<span id="conn1"></span></p>
+                                                      <p>Wechat：<span id="conn2"></span></p>
+                                                      <p>Email：<span id="conn3"></span></p>
+                                                </div>
+                                          </li>
+                                    </ul>
+                              </div>
+                        </form>
+                  </div>
+                  <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="updata">提交</button>
+                  </div>
+            </div>
+      </div>
+</div>
+
+<div class="modal" id="modalAdd" tabindex="-1" role="dialog" aria-labelledby="modalTitle1">
+      <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                  <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalTitle1">添加部门</h4>
+                  </div>
+                  <div class="modal-body">
+                        <form>
+                              <div class="form-group">
+                                    <label for="offname1" class="control-label">部门名称:</label>
+                                    <input type="text" class="form-control" id="offname1">
+                              </div>
+                              <div class="form-group">
+                                    <label for="offnum1" class="control-label">人员数量:
+                                          <a id="numcg1"><span class="glyphicon glyphicon-record
+"></span></a>
+                                    </label>
+                                    <input type="text" class="form-control" id="offnum1" disabled>
+                              </div>
+                              <div class="form-group">
+                                    <label class="control-label">部门负责人:</label>
+                                    <div>
+                                    <select class="form-control" id="main_id1">
+                                    <option value="1">Gervin</option>
+                                    <option value="2">Paul</option>
+                                    <option value="3">Cooper</option>
+                                    <option value="4">Andy</option>
+                                    <option value="5">Daniel</option>
+                                    </select>
+                                    </div>
+                              </div>
+                              <div class="form-group">
+                                    <label for="offtime1" class="control-label">成立时间:</label>
+                                    <input type="text" class="form-control" id="offtime1">
+                              </div>
+                        </form>
+                  </div>
+                  <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="insdata">添加</button>
+                  </div>
+            </div>
+      </div>
+</div>
+
+
+</body>
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.js"></script>
+<script>
+
+      var pid ;
+      $(function () {
+              $('#insbtn').click(function () {
+                      $('#modalAdd').modal('show');
+              })
+              $('#query').click(function () {
+                      funInit();
+                      $('#toolbar').css("visibility", "visible");
+              });
+              $('#selmain').click(function () {
+                      $('#selmain').replaceWith('<div style="display: inline"> <select id="sel1" onchange="selChange()"><option value="1">Gervin</option> <option value="2">Paul</option> <option value="3">Cooper</option> <option value="4">Andy</option> <option value="5">Daniel</option> </select></div>');
+              });
+
+              $('#updata').click(function () {
+                      updateInit();
+              });
+              $('#insdata').click(function () {
+                      saveInit();
+              });
+              
+              $('#numcg').click(function () {
+                      var name = $('#offname').val();
+                      numGET(0, name);
+              });
+              $('#numcg1').click(function () {
+                      var name = $('#offname1').val();
+                      if(name == ''){
+                              alert('必须输入部门名称！');
+                              $('#offname1').focus;
+                      }else {
+                              numGET(1, name);
+                      }
+              })
+
+      });
+        function selChange() {
+                var name = $('#sel1').find("option:selected").text();
+                console.log(name);
+                mainGET(name);
+                $('#main_id').text(name);
+        }
+
+        function funInit() {
+                var oTable = new Table2Init();
+                oTable.Init();
+        };
+
+        var Table2Init = function () {
+                var oTableInit = new Object();
+                oTableInit.Init = function () {
+                        $('#table2').bootstrapTable({
+                                url: 'offlist',
+                                method: 'post',
+                                toolbar: '#toolbar',
+                                striped: true,
+                                cache: false,
+                                pagination: true,
+                                sortable: false,
+                                sidePagination: "client",
+                                pageNumber: 1,
+                                pageSize: 10,
+                                pageList: [10, 25, 50, 100],
+                                showColumns: true,                  //是否显示所有的列
+                                showRefresh: true,
+                                minimumCountColumns: 2,             //最少允许的列数
+                                clickToSelect: true,
+                                uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                                showToggle:true,                    //是否显示详细视图和列表视图的切换按钮
+                                cardView: false,                    //是否显示详细视图
+                                detailView: false, //是否显示父子表//是否启用点击选中行
+                                columns: [{
+                                        field: 'offname',
+                                        title: '部门名称'
+
+                                },{
+                                        field: 'offnum',
+                                        title: '员工数量'
+
+                                },{
+                                        field: 'offmain',
+                                        title: '负责人'
+                                },{
+                                        field: 'offtime',
+                                        title: '成立时间'
+
+                                },{
+                                        title: '操作',
+                                        field: '_id',
+                                        align: 'center',
+                                        formatter: function (value, row, index) {
+                                                var editoff = '<a onclick="editInit(\'' + row._id + '\',\'' + row.offname
+                                                    + '\',\'' + row.offnum + '\',\''+row.offmain+'\',\''+row.offtime+'\')"><span class="glyphicon glyphicon-edit"></span></a>';
+                                                return editoff;
+                                        }
+
+                                }]
+                        });
+                };
+                return oTableInit;
+        };
+
+        var editInit = function (id, name, num, main, time) {
+                $('#modalEdit').modal('show');
+                $('#offname').val(name);
+                $('#offnum').val(num);
+                $('#offtime').val(time);
+                pid = id;
+                $('#main_id').text(main);
+                mainGET(main);
+
+        };
+
+
+        var mainGET = function (name) {
+                var data = {"mebname": name};
+                $.ajax({
+                        type: "POST",
+                        url: "meblist1/findOne",
+                        dataType: "json",
+                        contentType: "application/json",
+                        data: JSON.stringify(data)
+                }).done(function (json) {
+                        if(json.code ==201){
+                                alert(json.msg);
+                        }else {
+                                console.log(json);
+                                $('#conn1').text(json.mebphone);
+                                $('#conn2').text(json.mebphone);
+                                $('#conn3').text(json.mebemail);
+                                $('#main_time').text(json.mebtime);
+                        }
+                });
+        };
+
+       var numGET = function (el,locname) {
+               //ajax post 请求db中该部门的count 然后传值全局变量 似乎是window.xxx ="";一个就行从简。。。老子赶时间！！！\
+               var data = {'mebloc': locname};
+               $.ajax({
+                       type: "POST",
+                       url: "meblist1/numGET",
+                       dataType: "json",
+                       contentType: "application/json",
+                       data: JSON.stringify(data)
+               }).done(function (json) {
+                       if(json .code ==201){
+                               alert(json.msg);
+                       }else {
+                               if(el  == 0){
+                                       $('#offnum').val(json);
+                               }else if(el == 1){
+                                       $('#offnum1').val(json);
+                               }
+                       }
+               })
+       };
+       var updateInit = function () {
+               //ajax post 修改db数据
+               var offname = $('#offname').val();
+               var offnum = $('#offnum').val();
+               var offmain = $('#main_id').text();
+               var offtime = $('#offtime').val();
+
+               var data = {
+                       "_id": pid,
+                       "offname": offname,
+                       "offnum": offnum,
+                       "offmain": offmain,
+                       "offtime": offtime
+               };
+
+               $.ajax({
+                       type: "POST",
+                       url: "offlist/update",
+                       dataType: "json",
+                       contentType: "application/json",
+                       data: JSON.stringify(data)
+               }).done(function (json) {
+                       if(json.code = 200){
+                               alert(json.msg);
+                               $('#modalEdit').modal('hide');
+                               $('#table2').bootstrapTable('refresh');
+                       }else {
+                               alert(json.msg);
+                       }
+               })
+       };
+
+       var saveInit = function () {
+               var offname = $('#offname1').val();
+               var offnum = $('#offnum1').val();
+               var offmain = $('#main_id1').find("option:selected").text();
+               var offtime = $('#offtime1').val();
+
+               var data = {
+                       "offname": offname,
+                       "offnum": offnum,
+                       "offmain": offmain,
+                       "offtime": offtime
+               };
+               $.ajax({
+                       type: "POST",
+                       dataType: "json",
+                       url: "offlist/insert",
+                       contentType: "application/json",
+                       data: JSON.stringify(data)
+               }).done(function (json) {
+                       if(json.code == 200){
+                               alert(json.msg);
+                               $('#modalAdd').modal('hide');
+                               $('#table2').bootstrapTable('refresh');
+                       }else {
+                               alert(json.msg);
+                       }
+               })
+
+       };
+
+
+</script>
+</html>

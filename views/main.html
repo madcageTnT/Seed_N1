@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <title><%= title %></title>
+      <meta name="description" content="Copyright @Madcage1994">
+      <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.css">
+      <link rel="stylesheet" href="components/metisMenu/dist/metisMenu.css">
+      <link rel="stylesheet" href="components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css">
+      <link rel="stylesheet" href="css/main/sidebar.css">
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+      <div class="container-fluid">
+            <div class="navbar-header">
+                  <a class="navbar-brand" href="#">MCG</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                  <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                              <a href="#" id="drop1" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-calendar" aria-hidden="true"></span></a>
+                              <ul class="dropdown-menu" id="menu1" aria-labelledby="drop1">
+                                    <li><input type="text" id="datetimepicker" hidden style="width: 1px"></li>
+                              </ul>
+
+                        </li>
+
+                        <li class="dropdown">
+                              <a href="#" id="drop2" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></a>
+                              <ul class="dropdown-menu" id="menu2" aria-labelledby="drop2">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="#">Separated link</a></li>
+                              </ul>
+                        </li>
+
+                        <li class="dropdown">
+                              <a href="#" id="drop3" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span></a>
+                              <ul class="dropdown-menu" id="menu3" aria-labelledby="drop3">
+                                    <li><a href="#">当前用户：<%- username %></a></li>
+                                    <li><a href="#">身份：Master</a></li>
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="/logout">退出</a></li>
+                              </ul>
+                        </li>
+                  </ul>
+
+            </div><!-- /.navbar-collapse -->
+      </div>
+</nav>
+
+<div class="container-fluid">
+      <div class="row">
+            <div class="col-lg-2">
+                  <div class="sidebar-nav">
+                        <ul class="metismenu" id="menu">
+                              <li>
+                                    <a class="has-arrow" href="#" aria-expanded="false">数据管理</a>
+                                    <ul aria-expanded="true">
+                                          <li><a href="/out" target="iframe0">员工管理</a></li>
+                                          <li><a href="/out1" target="iframe0">部门管理</a></li>
+                                    </ul>
+                              </li>
+                              <li>
+                                    <a class="has-arrow" href="#" aria-expanded="false">日常管理</a>
+                                    <ul aria-expanded="true">
+                                          <li><a href="/miss1" target="iframe0">考勤管理</a></li>
+                                          <li><a href="/miss" target="iframe0">加班管理</a></li>
+                                    </ul>
+                              </li>
+                              <li>
+                                    <a class="has-arrow" href="#" aria-expanded="false">事务管理</a>
+                                    <ul aria-expanded="true">
+                                          <li><a href="/push" target="iframe0">任务安排</a></li>
+                                          <li><a href="/push1" target="iframe0">通知管理</a></li>
+                                    </ul>
+                              </li>
+                        </ul>
+                  </div>
+            </div>
+            <div class="col-lg-10">
+                  <iframe src="/out" width="100%" onload="this.height=1200" frameborder="0" scrolling="no" id="iframe0" name="iframe0"></iframe>
+            </div>
+      </div>
+</div>
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="components/metisMenu/dist/metisMenu.min.js"></script>
+<script src="components/moment/min/moment.min.js"></script>
+<script src="components/moment/locale/zh-cn.js"></script>
+<script src="components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+
+<script>
+      $(function () {
+              window.setInterval("FrameInHeight()",200);
+              $('#menu').metisMenu();
+
+              $('#datetimepicker').datetimepicker({
+                      locale: 'zh-cn',
+                      viewMode: 'days',
+                      format: 'yyyy-mm-dd',
+                      showTodayButton: true
+              });
+
+              $('#drop1').click(function () {
+                      $('#datetimepicker').datetimepicker('show');
+              });
+
+      });
+
+      function FrameInHeight() {
+              var ifr = $('#iframe0');
+              try{
+                      var height1 = ifr.contentWindow.document.body.scrollHeight;
+                      var height2 = ifr.contentWindow.document.documentElement.scrollHeight;
+                      var height = Math.max(height1, height2);
+                      ifr.height = height;
+                      console.log(height);
+              } catch (ex){}
+      }
+</script>
+</body>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <title></title>
+      <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.min.css">
+      <link rel="stylesheet" href="components/bootstrap-table/dist/bootstrap-table.min.css">
+      <link rel="stylesheet" href="../public/components/bootstrap/dist/css/bootstrap.css">
+      <link rel="stylesheet" href="components/wangEditor/dist/css/wangEditor.css">
+      <style>
+            body{
+                  margin: 50px;
+                  width:100%;
+            }
+            html{
+                  width:100%;
+            }
+            #editor{
+                  width: 500px;
+                  height: 300px;
+            }
+            #addsub{
+                  visibility: hidden;
+            }
+      </style>
+</head>
+<body>
+
+<div class="page-header">
+      <h1>新消息推送</h1>
+      <button class="btn btn-info" id="addmis">新增任务</button>
+      <button class="btn btn-info" id="addsub">提交</button>
+</div>
+<div  id="papa" style="width: 90%; align-items: center; visibility: hidden">
+      <div class="form-group">
+            <label for="example1">标题</label>
+            <input type="text" class="form-control" id="example1" placeholder="请输入标题">
+      </div>
+      <div id="editor" style="height: 300px">
+            <!--<p>请输入内容...</p>-->
+      </div>
+</div>
+
+
+</body>
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="components/wangEditor/dist/js/wangEditor.js"></script>
+<script>
+      $(function () {
+              var editor = new wangEditor('editor');
+              editor.config.menus = [
+                      'bold',
+                      'underline',
+                      'italic',
+                      'strikethrough',
+                      'eraser',
+                      'forecolor',
+                      'fontfamily',
+                      'fontsize'
+
+              ];
+
+              $('#addmis').click(function () {
+                      editor.create();
+                      $('#addsub').css('visibility', 'visible');
+                      $('#papa').css('visibility', 'visible');
+              });
+
+              $('#addsub').click(function () {
+//                      editor.clear();
+//                      $('#example1').val(' ');
+//                      $('#papa').css('visibility', 'hidden');
+                      var html = editor.$txt.html();
+                      var title = $('#example1').val();
+                      console.log(title);
+                      var data = {
+                              "msgtitle": title,
+                              "msghtml": html
+                      };
+                      $.ajax({
+                              type:"post",
+                              url: "msg",
+                              dataType:"json",
+                              contentType:"application/json",
+                              data:JSON.stringify(data)
+                      }).done(function (json) {
+                              if(json.code ==200){
+                                      alert(json.msg);
+                                      editor.clear();
+                                      $('#example1').val(' ');
+                                      $('#papa').css('visibility', 'hidden');
+                                      $('#addsub').css('visibility', 'hidden');
+
+                              }else{
+                                      alert(json.msg);
+                              }
+                      })
+              })
+      });
+
+</script>
+</html>

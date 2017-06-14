@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <title></title>
+      <link rel="stylesheet" href="components/bootstrap/dist/css/bootstrap.min.css">
+      <link rel="stylesheet" href="components/bootstrap-table/dist/bootstrap-table.min.css">
+      <link rel="stylesheet" href="../public/components/bootstrap/dist/css/bootstrap.css">
+      <link rel="stylesheet" href="components/bootstrap-fileinput/css/fileinput.min.css">
+      <style>
+            body{
+                  margin: 50px;
+                  width:100%;
+            }
+            html{
+                  width:100%;
+            }
+      </style>
+</head>
+<body>
+
+<div class="page-header">
+      <h1>任务发布</h1>
+      <button class="btn btn-info" id="addmis">新增任务</button>
+</div>
+
+<div>
+
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs" role="tablist" id="myTab">
+            <li role="presentation" class="active"><a href="#allmiss" aria-controls="allmiss" role="tab" data-toggle="tab">全部任务</a></li>
+            <li role="presentation"><a href="#unfin" aria-controls="unfin" role="tab" data-toggle="tab">未完成任务</a></li>
+            <li role="presentation"><a href="#newmiss" aria-controls="newmiss" role="tab" data-toggle="tab" >新发布任务</a></li>
+
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active" id="allmiss">
+                  <div class="container">
+                        <table id="tableAll"></table>
+                  </div>
+
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="unfin">
+                  <div class="container">
+                        <div id="toolbar1" class="btn-group" style="visibility: hidden">
+                              <button id="tb1del" type="button" class="btn btn-default" ><span class="glyphicon glyphicon-remove" aria-hidden="true" ></span>批量撤销</button>
+                        </div>
+                        <table id="tableErr"></table>
+                  </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="newmiss">
+                  <div class="container">
+                        <div id="toolbar2" class="btn-group" style="visibility: hidden">
+                              <button id="tb2del" type="button" class="btn btn-default" ><span class="glyphicon glyphicon-remove" aria-hidden="true" ></span>批量撤销</button>
+                        </div>
+                        <table id="tableNew"></table>
+                  </div>
+
+            </div>
+      </div>
+
+</div>
+
+
+<div class="modal" id="modalAdm" tabindex="-1" role="dialog" aria-labelledby="modalTitle1">
+      <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                  <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalTitle1"></h4>
+                  </div>
+                  <div class="modal-body">
+                        <form id="form1">
+                              <div class="form-group">
+                              <label for="amdname" class="control-label">任务名称:</label>
+                              <input type="text" class="form-control" id="amdname">
+                              </div>
+                              <div class="form-group">
+                                    <label for="amdate" class="control-label">当前日期:</label>
+                                    <input type="text" class="form-control" id="amdate" disabled>
+                              </div>
+                              <div class="form-group">
+                                    <label for="amdadmin" class="control-label">发布人:</label>
+                                    <input type="text" class="form-control" id="amdadmin">
+                              </div>
+                              <div class="form-group">
+                                    <label for="amdloc" class="control-label">部门选择:</label>
+                                    <select class="form-control" id="amdloc">
+                                          <option>所有部门</option>
+                                          <option>部门1</option>
+                                          <option>部门2</option>
+                                          <option>部门3</option>
+                                          <option>部门4</option>
+                                    </select>
+                              </div>
+                              <div class="form-group">
+                                    <label for="amdman" class="control-label">员工选择:</label>
+                                    <select class="form-control" id="amdman">
+                                          <option>所有员工</option>
+                                          <option>员工1</option>
+                                          <option>员工2</option>
+                                          <option>员工3</option>
+                                          <option>员工4</option>
+                                    </select>
+                              </div>
+                              <div class="form-group">
+                                    <label for="amdinfo" class="control-label">任务详情:</label>
+                                    <textarea class="form-control" rows="3" id="amdinfo"></textarea>
+                              </div>
+                              <div class="form-group">
+                                    <label for="amdplus" class="control-label">附件:</label>
+                                    <input id="amdplus" name="file" type="file" multiple class="file-loading">
+                                    <div id="errorBlock" class="help-block"></div>
+                              </div>
+                        </form>
+                  </div>
+                  <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="misAdd">发布任务</button>
+                  </div>
+            </div>
+      </div>
+</div>
+
+<div class="modal" id="modalShow" tabindex="-1" role="dialog" aria-labelledby="modalTitle2">
+      <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                  <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalTitle2"></h4>
+                  </div>
+                  <div class="modal-body">
+                        <form>
+                              <div class="form-group">
+                                    <label for="funame" class="control-label">任务名称:</label>
+                                    <input type="text" class="form-control" id="funame">
+                              </div>
+                              <div class="form-group">
+                                    <label for="fundate" class="control-label">发布日期:</label>
+                                    <input type="text" class="form-control" id="fundate" disabled>
+                              </div>
+                              <div class="form-group">
+                                    <label for="funadmin" class="control-label">发布人:</label>
+                                    <input type="text" class="form-control" id="funadmin">
+                              </div>
+                              <div class="form-group">
+                                    <label for="funman" class="control-label">人员配置:</label>
+                                    <input type="text" class="form-control" id="funman">
+                              </div>
+                              <div class="form-group">
+                                    <label for="funinfo" class="control-label">任务详情:</label>
+                                    <div class="well" id="funinfo"></div>
+                              </div>
+                              <div class="form-group">
+                                    <label for="funplus" class="control-label">附件:</label>
+                                    <a  id="funplus" href="#"><span class="glyphicon glyphicon-download"></span></a>
+                              </div>
+                              <div class="form-group">
+                                    <label for="funsat" class="control-label">状态:</label>
+                                    <input type="text" class="form-control" id="funsat" disabled>
+                              </div>
+                              <span id="funid1" style="display: none"></span>
+                        </form>
+                  </div>
+                  <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="funNote">通知</button>
+                        <button type="button" class="btn btn-primary" id="funDel">撤销任务</button>
+                  </div>
+            </div>
+      </div>
+</div>
+
+<div class="modal" id="modalNew" tabindex="-1" role="dialog" aria-labelledby="modalTitle3">
+      <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                  <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalTitle3"></h4>
+                  </div>
+                  <div class="modal-body">
+                        <form>
+                              <div class="form-group">
+                                    <label for="newname" class="control-label">任务名称:</label>
+                                    <input type="text" class="form-control" id="newname">
+                              </div>
+                              <div class="form-group">
+                                    <label for="newdate" class="control-label">发布日期:</label>
+                                    <input type="text" class="form-control" id="newdate" disabled>
+                              </div>
+                              <div class="form-group">
+                                    <label for="newadmin" class="control-label">发布人:</label>
+                                    <input type="text" class="form-control" id="newadmin">
+                              </div>
+                              <div class="form-group">
+                                    <label for="newman" class="control-label">人员配置:</label>
+                                    <input type="text" class="form-control" id="newman">
+                              </div>
+                              <div class="form-group">
+                                    <label for="newinfo" class="control-label">任务详情:</label>
+                                    <div class="well" id="newinfo"></div>
+                              </div>
+                              <div class="form-group">
+                                    <label for="newplus" class="control-label">附件:</label>
+                                    <a  id="newplus" href="#"><span class="glyphicon glyphicon-download"></span></a>
+                              </div>
+                              <div class="form-group">
+                                    <label for="newsat" class="control-label">状态:</label>
+                                    <input type="text" class="form-control" id="newsat" disabled>
+                              </div>
+                              <span id="funid2" style="display: none"></span>
+                        </form>
+                  </div>
+                  <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" id="newDel">撤销发布</button>
+                  </div>
+            </div>
+      </div>
+</div>
+
+
+</body>
+<script src="components/jquery/dist/jquery.min.js"></script>
+<script src="components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="components/moment/min/moment.min.js"></script>
+<script src="components/moment/locale/zh-cn.js"></script>
+<script src="components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.js"></script>
+<script src="components/bootstrap-fileinput/js/fileinput.min.js"></script>
+<script src="components/bootstrap-fileinput/js/locales/zh.js"></script>
+<script>
+      qnurl = "http://oozztcwm6.bkt.clouddn.com/";
+      $(function () {
+              $('#allmiss').click(function () {
+                      $('#tableAll').bootstrapTable('refresh');
+              });
+              $('#unfin').click(function () {
+                      $('#tableErr').bootstrapTable('refresh');
+              });
+              $('#newmiss').click(function () {
+                      $('#tableNew').bootstrapTable('refresh');
+              })
+              $('#addmis').click(function () {
+                        var date = moment().format('LLL');
+                        $('#modalAdm').modal('show');
+                        $("#amdate").val(date);
+              });
+              $('#tb1del').click(function () {
+                      getSelection1();
+              });
+              $('#tb2del').click(function () {
+                      getSelection2();
+              });
+              $('#funDel').click(function () {
+                      delMbtn1();
+              });
+              $('#newDel').click(function () {
+                      delMbtn2();
+              });
+              $('#amdplus').fileinput({
+                      language: 'zh', //设置语言
+                      uploadUrl: "FileUpload/LocUpload",
+                      showPreview: false,
+                      allowedFileExtensions: ["zip", "rar", "gz", "tgz"],
+                      enctype: 'multipart/form-data',
+                      elErrorContainer: "#errorBlock",
+                      showUpload: true, //是否显示上传按钮
+                      browseClass: "btn btn-primary", //按钮样式
+                      previewFileIcon: "<i class='glyphicon glyphicon-king'></i>"
+              }).on('fileuploaded',function (event, data) {
+                      if(data.response.code == 200){
+                              alert(data.response.msg);
+                              var filename = {"filename": data.response.msg};
+                              $('#misAdd').attr('disabled','disabled');
+                              $.ajax({
+                                      url: "FileUpload/qnUpload",
+                                      type: "POST",
+                                      dataType:"json",
+                                      contentType:"application/json",
+                                      data:JSON.stringify(filename)
+                              }).done(function (json) {
+                                      if(json.code ==200){
+                                              alert(json.msg);
+                                              qnurl += json.msg;
+                                              $("#misAdd").removeAttr('disabled');
+                                      }else {
+                                              alert(json.msg);
+                                      }
+                              });
+                      }else {
+                              alert('失败');
+                      }
+//                      if(data.response)
+//                      {
+//                              console.log(data.response.msg);
+//                      }
+              });
+
+              $('#misAdd').click(function () {
+                      newMission();
+              });
+
+              alltable();
+      });
+
+      function  alltable() {
+              var otable1 = new table1Init();
+              otable1.Init();
+              var otable2 = new table2Init();
+              otable2.Init();
+              var otable3 = new table3Init();
+              otable3.Init();
+              $('#toolbar1').css('visibility', 'visible');
+              $('#toolbar2').css('visibility', 'visible');
+      }
+
+      var newMission = function () {
+              var data = {
+                      "quename": $('#amdname').val(),
+                      "quedate": $('#amdate').val(),
+                      "quemain": $('#amdadmin').val(),
+                      "queloc": $('#amdloc').find("option:selected").text(),
+                      "queman": $('#amdman').find("option:selected").text(),
+                      "queinfo": $('#amdinfo').val(),
+                      "queplus": qnurl
+              };
+              $.ajax({
+                      url: "Area11/save",
+                      type: "post",
+                      dataType:"json",
+                      contentType:"application/json",
+                      data:JSON.stringify(data)
+              }).done(function (json) {
+                      if(json.code == 200){
+                              alert(json.msg);
+                              $('#modalAdm').modal('hide');
+                              formclear();
+                      }else {
+                              alert(json.msg);
+                      }
+              });
+      };
+
+      function getSelection1() {
+              var data =$.map($('#tableErr').bootstrapTable('getSelections'), function (row) {
+                      return row._id;
+              });
+              var length = $('#tableErr').bootstrapTable('getSelections').length;
+              console.log(length);
+              if(length == 0){
+                      alert('请至少选择一个数据!');
+              }else {
+                      var ja = confirm('操作不可逆,是否确认删除?');
+                      if(ja == true){
+                              delMission(data);
+                              $('#tableErr').bootstrapTable('refresh');
+                      }else{
+                              $('#tableErr').bootstrapTable('refresh');
+                      }
+
+
+              }
+      }
+
+      function getSelection2() {
+              var data =$.map($('#tableNew').bootstrapTable('getSelections'), function (row) {
+                      return row._id;
+              });
+              var length = $('#tableNew').bootstrapTable('getSelections').length;
+              console.log(length);
+              if(length == 0){
+                      alert('请至少选择一个数据!');
+              }else {
+                      var ja = confirm('操作不可逆,是否确认删除?');
+                      if(ja == true){
+                              delMission(data);
+                              $('#tableNew').bootstrapTable('refresh');
+                      }else{
+                              $('#tableNew').bootstrapTable('refresh');
+                      }
+
+
+              }
+      }
+
+      var delMission = function (json) {
+              var data = {"quepid": json};
+              $.ajax({
+                      url: "Area11/remove",
+                      type: "post",
+                      dataType:"json",
+                      contentType:"application/json",
+                      data:JSON.stringify(data)
+              }).done(function (json) {
+                      if(json.code == 200){
+                              alert(json.msg);
+                      }else {
+                              alert(json.msg);
+                      }
+              })
+      };
+
+      var formclear = function () {
+              $('#amdname').val('');
+              $('#amdate').val('');
+              $('#amdadmin').val('');
+              $("#amdloc:first option:first").attr("selected","selected");
+              $("#amdman:first option:first").attr("selected","selected");
+              $('#amdinfo').val('');
+              $('#amdplus').val('');
+      };
+
+      var table1Init = function () {
+              var otable1Init = new Object();
+              otable1Init.Init = function () {
+                      $('#tableAll').bootstrapTable({
+                              url: 'Area11',
+                              method: 'post',
+                              striped: true,
+                              cache: false,
+                              pagination: true,
+                              sortable: true,
+                              sortOrder: "asc",
+                              queryParams: otable1Init.queryParams,
+                              sidePagination: "client",
+                              pageNumber: 1,
+                              pageSize: 10,
+                              pageList: [10, 25, 50, 100],
+                              search: true,
+                              strictSearch: true,
+                              showColumns: true,                  //是否显示所有的列
+                              showRefresh: true,
+                              minimumCountColumns: 2,             //最少允许的列数
+                              clickToSelect: true,
+                              uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                              showToggle:true,                    //是否显示详细视图和列表视图的切换按钮
+                              cardView: false,                    //是否显示详细视图
+                              detailView: false,
+                              columns: [{
+                                      field: "quedate",
+                                      title: "发布时间",
+                                      sortable: true
+                              },{
+                                      field: "quename",
+                                      title: '任务名称'
+                              },{
+                                      field: "quemain",
+                                      title: "发布人"
+                              },{
+                                      field: "queloc",
+                                      title: "部门"
+                              },{
+                                      field: "queman",
+                                      title: "负责人"
+                              },{
+                                      field: "queinfo",
+                                      title: "简介"
+                              },{
+                                      field: "questat",
+                                      title: "状态"
+                              }]
+                      })
+              };
+              otable1Init.queryParams = function (params) {
+                      var temp = {
+                              limit: params.limit,
+                              offset: params.offset
+                      };
+                      return temp;
+              };
+              return otable1Init;
+      };
+
+      var table2Init = function () {
+              var otable2Init = new Object();
+              otable2Init.Init = function () {
+                      $('#tableErr').bootstrapTable({
+                              url: 'Area11/getErr',
+                              method: 'post',
+                              toolbar: '#toolbar1',
+                              striped: true,
+                              cache: false,
+                              pagination: true,
+                              sortable: true,
+                              sortOrder: "asc",
+                              queryParams: otable2Init.queryParams,
+                              sidePagination: "client",
+                              pageNumber: 1,
+                              pageSize: 10,
+                              pageList: [10, 25, 50, 100],
+                              search: true,
+                              strictSearch: true,
+                              showColumns: true,                  //是否显示所有的列
+                              showRefresh: true,
+                              minimumCountColumns: 2,             //最少允许的列数
+                              clickToSelect: true,
+                              uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                              showToggle:true,                    //是否显示详细视图和列表视图的切换按钮
+                              cardView: false,                    //是否显示详细视图
+                              detailView: false,
+                              columns: [{
+                                      checkbox: true
+                              },{
+                                      field: "quedate",
+                                      title: "发布时间",
+                                      sortable: true
+                              },{
+                                      field: "quename",
+                                      title: '任务名称'
+                              },{
+                                      field: "quemain",
+                                      title: "发布人"
+                              },{
+                                      field: "queloc",
+                                      title: "部门"
+                              },{
+                                      field: "queman",
+                                      title: "负责人"
+                              },{
+                                      field: "queinfo",
+                                      title: "简介"
+                              },{
+                                      field: "questat",
+                                      title: "状态"
+                              },{
+                                      field: "_id",
+                                      title: "操作",
+                                      formatter: function (value, row, index) {
+                                              var a = '<a onclick="showinfo1(\'' + row.quedate + '\',\'' + row.quename + '\',\''+row.quemain+'\',\''+row.queloc+'\',\''+row.queman+'\',\''+row.queinfo+ '\',\''+row._id+ '\',\''+row.questat+ '\')">查看</a>';
+                                              return a;
+                                      }
+                              }]
+                      })
+              };
+              otable2Init.queryParams = function (params) {
+                      var temp = {
+                              limit: params.limit,
+                              offset: params.offset
+                      };
+                      return temp;
+              };
+              return otable2Init;
+      };
+
+      var table3Init = function () {
+              var otable3Init = new Object();
+              otable3Init.Init = function () {
+                      $('#tableNew').bootstrapTable({
+                              url: 'Area11/getNew',
+                              method: 'post',
+                              striped: true,
+                              toolbar: '#toolbar2',
+                              cache: false,
+                              pagination: true,
+                              sortable: true,
+                              sortOrder: "asc",
+                              queryParams: otable3Init.queryParams,
+                              sidePagination: "client",
+                              pageNumber: 1,
+                              pageSize: 10,
+                              pageList: [10, 25, 50, 100],
+                              search: true,
+                              strictSearch: true,
+                              showColumns: true,                  //是否显示所有的列
+                              showRefresh: true,
+                              minimumCountColumns: 2,             //最少允许的列数
+                              clickToSelect: true,
+                              uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                              showToggle:true,                    //是否显示详细视图和列表视图的切换按钮
+                              cardView: false,                    //是否显示详细视图
+                              detailView: false,
+                              columns: [{
+                                      checkbox: true
+                              },{
+                                      field: "quedate",
+                                      title: "发布时间",
+                                      sortable: true
+                              },{
+                                      field: "quename",
+                                      title: '任务名称'
+                              },{
+                                      field: "quemain",
+                                      title: "发布人"
+                              },{
+                                      field: "queloc",
+                                      title: "部门"
+                              },{
+                                      field: "queman",
+                                      title: "负责人"
+                              },{
+                                      field: "queinfo",
+                                      title: "简介"
+                              },{
+                                      field: "questat",
+                                      title: "状态"
+                              },{
+                                      field: "_id",
+                                      title: "操作",
+                                      formatter: function (value, row, index) {
+                                              var a = '<a onclick="showinfo2(\'' + row.quedate
+                                                  + '\',\'' + row.quename + '\',\''+row.quemain+'\',\''+row.queloc+'\',\''+row.queman+'\',\''+row.queinfo+ '\',\''+row._id+ '\',\''+row.questat+ '\')">查看</a>';
+                                              return a;
+                                      }
+                              }]
+                      })
+              };
+              otable3Init.queryParams = function (params) {
+                      var temp = {
+                              limit: params.limit,
+                              offset: params.offset
+                      };
+                      return temp;
+              };
+              return otable3Init;
+      };
+      
+      var showinfo1 = function (date, name, main, loc, man, info, id, stat) {
+            $('#fundate').val(date);
+            $('#funame').val(name);
+            $('#funadmin').val(main);
+            $('#funman').val(loc + ":" + man);
+            $('#funinfo').text(info);
+            $('#funsat').val(stat);
+            $('#funid1').text(id);
+            var data = {"_id": id};
+            $.ajax({
+                    type:"post",
+                    url: "Area11/getQn",
+                    dataType:"json",
+                    contentType:"application/json",
+                    data:JSON.stringify(data)
+            }).done(function (json) {
+                    if(json.code == 201){
+                            alert(json.msg);
+                    }else {
+                            console.log(json);
+                            var url = json.queplus;
+                            console.log(url);
+                            $('#funplus').attr("href", url);
+                            var pop = url.split('/').pop();
+                            $('#funplus').text(pop);
+                    }
+            });
+            $('#modalShow').modal('show');
+      };
+
+      var  showinfo2 = function (date, name, main, loc, man, info, id, stat) {
+            $('#newdate').val(date);
+            $('#newname').val(name);
+            $('#newadmin').val(main);
+            $('#newman').val(loc + ":" + man);
+            $('#newinfo').text(info);
+            $('#newsat').val(stat);
+            $('#funid2').text(id);
+              var data = {"_id": id};
+              $.ajax({
+                      type:"post",
+                      url: "Area11/getQn",
+                      dataType:"json",
+                      contentType:"application/json",
+                      data:JSON.stringify(data)
+              }).done(function (json) {
+                      if(json.code == 201){
+                              alert(json.msg);
+                      }else {
+                              var url = json.queplus;
+                              console.log(url);
+                              $('#newplus').attr("href", url);
+                              var pop = url.split('/').pop();
+                              $('#newplus').text(pop);
+                      }
+              });
+              $('#modalNew').modal('show');
+      };
+
+      var delMbtn1 = function () {
+              var id = $('#funid1').text();
+              var data = {"quepid": id};
+              $.ajax({
+                      url: "Area11/remove",
+                      type: "post",
+                      dataType:"json",
+                      contentType:"application/json",
+                      data:JSON.stringify(data)
+              }).done(function (json) {
+                      if(json.code == 200){
+                              alert(json.msg);
+                              $('#tableErr').bootstrapTable('refresh');
+                              $('#modalShow').modal('hide');
+                      }else {
+                              alert(json.msg);
+                      }
+              });
+      };
+
+      var delMbtn2 = function () {
+              var id = $('#funid2').text();
+              var data = {"quepid": id};
+              $.ajax({
+                      url: "Area11/remove",
+                      type: "post",
+                      dataType:"json",
+                      contentType:"application/json",
+                      data:JSON.stringify(data)
+              }).done(function (json) {
+                      if(json.code == 200){
+                              alert(json.msg);
+                              $('#tableNew').bootstrapTable('refresh');
+                              $('#modalNew').modal('hide');
+                      }else {
+                              alert(json.msg);
+                      }
+              });
+      };
+
+
+</script>
+</html>
